@@ -149,6 +149,24 @@ const supabaseClient = window.supabase.createClient(
 window.sadaSupabase = supabaseClient;
 console.log("Supabase client initialized");
 
+async function testSupabaseConnection() {
+  const { data, error } = await window.sadaSupabase
+    .from("customers")
+    .select("*")
+    .limit(1);
+
+  if (error) {
+    console.error("فشل اختبار قاعدة البيانات:", error.message);
+    alert("تعذر قراءة العملاء: " + error.message);
+    return;
+  }
+
+  console.log("نجح الاتصال بقاعدة البيانات", data);
+  alert("تم الاتصال بقاعدة البيانات بنجاح!");
+}
+
+testSupabaseConnection();
+
 const $ = id => document.getElementById(id);
 const storageKey = "sadaAlEmarDemoV1";
 const initial = {
