@@ -395,7 +395,7 @@ function openForm(type){
   }).join("");
   $("content").innerHTML=heading(f.title,"أدخل البيانات ثم اضغط حفظ")+
     `<section class="panel"><form id="entryForm"><div class="form-grid">${fields}</div><div class="form-actions"><button class="btn primary" type="submit">حفظ البيانات</button><button class="btn secondary" type="button" onclick="showPage('${currentPage}')">إلغاء</button></div></form></section>`;
-  $("entryForm").addEventListener("submit",e=>{
+  $("entryForm").addEventListener("submit",async e=>{
     e.preventDefault();
     const data={};
     f.fields.forEach(([id])=>{const el=$("f-"+id);data[id]=el?el.value.trim():""});
@@ -448,17 +448,6 @@ async function removeRecord(key,id){
       alert("تعذر تحديد معرّف العميل في قاعدة البيانات.");
       return;
     }
-
-    const { error } = await supabaseClient
-      .from("customers")
-      .delete()
-      .eq("id", customerId);
-
-    if(error){
-      alert("تعذر حذف العميل من قاعدة البيانات: " + error.message);
-      console.error(error);
-      return;
-    }
   }
 
   db[key] = db[key].filter(x => x.id !== id);
@@ -495,35 +484,7 @@ async function removeRecord(key,id){
   db[key] = db[key].filter(x => x.id !== id);
   save();
   render();
-}
- async function removeRecord(key,id){
-
-  if(!confirm("هل تريد حذف هذا السجل؟")) return;
-
-  if(key === "customers"){
-
-    const customer = db.customers.find(x => x.id === id);
-
-    if(!customer) return;
-
-    const customerId = customer.supabaseId || customer.id;
-
-    if(!customer.supabaseId){
-
-      alert("تعذر تحديد معرّف العميل في قاعدة البيانات.");
-
-      return;
-
-    }
-
-    const { error } = await supabaseClient
-
-      .from("customers")
-
-      .delete()
-
-      .eq("id", customerId);
-
+ 
     if(error){
 
       alert("تعذر حذف العميل من قاعدة البيانات: " + error.message);
