@@ -497,7 +497,8 @@ function openForm(type){
   db[key] = db[key].filter(x => x.id !== id);
   save();
   render();
-}
+ }
+ 
 async function removeRecord(key,id){
   if(!confirm("هل تريد حذف هذا السجل؟")) return;
 
@@ -526,30 +527,7 @@ async function removeRecord(key,id){
   save();
   render();
 }
-  }
 
-  db[key] = db[key].filter(x => x.id !== id);
-  save();
-  render();
- 
-    if(error){
-
-      alert("تعذر حذف العميل من قاعدة البيانات: " + error.message);
-
-      console.error(error);
-
-      return;
-
-    }
-
-  }
-
-  db[key] = db[key].filter(x => x.id !== id);
-
-  save();
-
-  render();
-}
 function editStock(id){
   const item=db.inventory.find(x=>x.id===id);
   if(!item)return;
