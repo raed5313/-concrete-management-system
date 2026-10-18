@@ -459,50 +459,41 @@ function openForm(type){
   });
 }
 
-async function removeRecord(key,id){
-  if(!confirm("هل تريد حذف هذا السجل؟")) return;
 
-  if(key === "customers"){
-    const customer = db.customers.find(x => x.id === id);
-    if(!customer) return;
-
-    const customerId = customer.supabaseId || customer.id;
-
-    if(!customer.supabaseId){
-      alert("تعذر تحديد معرّف العميل في قاعدة البيانات.");
-      return;
-    }
   }
 
   db[key] = db[key].filter(x => x.id !== id);
   save();
   render();
 }
-
 async function removeRecord(key,id){
   if(!confirm("هل تريد حذف هذا السجل؟")) return;
 
-  if(key === "customers"){
-    const customer = db.customers.find(x => x.id === id);
+  if(key==="customers"){
+    const customer=db.customers.find(x=>x.id===id);
     if(!customer) return;
-
-    const customerId = customer.supabaseId || customer.id;
 
     if(!customer.supabaseId){
       alert("تعذر تحديد معرّف العميل في قاعدة البيانات.");
       return;
     }
 
-    const { error } = await supabaseClient
+    const {error}=await supabaseClient
       .from("customers")
       .delete()
-      .eq("id", customerId);
+      .eq("id",customer.supabaseId);
 
     if(error){
-      alert("تعذر حذف العميل من قاعدة البيانات: " + error.message);
+      alert("فشل حذف العميل: "+error.message);
       console.error(error);
       return;
     }
+  }
+
+  db[key]=db[key].filter(x=>x.id!==id);
+  save();
+  render();
+}
   }
 
   db[key] = db[key].filter(x => x.id !== id);
