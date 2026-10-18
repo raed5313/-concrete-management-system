@@ -490,15 +490,6 @@ function openForm(type){
     if(save()){showPage(type==="stock"?"inventory":type==="transaction"?"finance":type==="order"?"orders":type==="load"?"loads":type==="customer"?"customers":type==="driver"?"drivers":"vehicles");}
   });
 }
-
-
-  }
-
-  db[key] = db[key].filter(x => x.id !== id);
-  save();
-  render();
- }
- 
 async function removeRecord(key,id){
   if(!confirm("هل تريد حذف هذا السجل؟")) return;
 
