@@ -224,10 +224,20 @@ $("nav").addEventListener("click",e=>{
 });
 
 function showPage(page){
-  currentPage=page; searchTerm="";
+  currentPage=page;
+  searchTerm="";
+
   $("top-title").textContent=pageTitle(page);
-  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+
+  document.querySelectorAll(".nav button")
+    .forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+
   render();
+
+  if(page==="customers"){
+    loadCustomersFromSupabase();
+  }
+}
  async function loadCustomersFromSupabase(){
   const {data,error}=await supabaseClient
     .from("customers")
