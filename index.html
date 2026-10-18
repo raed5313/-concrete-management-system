@@ -415,8 +415,32 @@ function openForm(type){
       db.loads.push({...data,id:nextId(db.loads),orderId:order.id,orderNumber:order.number,customer:order.customer,qty:Number(data.qty),loadNo:db.loads.filter(l=>l.orderId===order.id).length+1});
       if(previous+Number(data.qty)>=Number(order.qty))order.status="مكتمل";else order.status="قيد التجهيز";
     }else if(type==="customer"){
-      if(!data.name){alert("أدخل اسم العميل");return}
-      db.customers.push({...data,id:nextId(db.customers)});
+  if(!data.name){
+    alert("أدخل اسم العميل");
+    return;
+  }
+
+  const { data: customer, error } = await supabaseClient
+    .from("customers")
+    .insert([{
+      name: data.name,
+      phone: data.phone,
+      address: data.address,
+      notes: data.notes
+    }])
+    .select()
+    .single();
+
+  if(error){
+    alert("فشل حفظ العميل: " + error.message);
+    console.error(error);
+    return;
+  }
+
+  db.customers.push({
+    ...customer,
+    supabaseId: customer.id
+  });
     }else if(type==="driver"){
       if(!data.name){alert("أدخل اسم السائق");return}
       db.drivers.push({...data,id:nextId(db.drivers)});
