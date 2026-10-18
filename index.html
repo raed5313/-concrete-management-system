@@ -146,10 +146,31 @@ const supabaseClient = window.supabase.createClient(
   window.SUPABASE_CONFIG.publishableKey
 );
 
+
+const supabaseReady = Boolean(
+  window.supabase &&
+  window.SUPABASE_CONFIG &&
+  window.SUPABASE_CONFIG.url &&
+  window.SUPABASE_CONFIG.publishableKey
+);
+
+const supabaseClient = supabaseReady
+  ? window.supabase.createClient(
+      window.SUPABASE_CONFIG.url,
+      window.SUPABASE_CONFIG.publishableKey
+    )
+  : null;
+
 window.sadaSupabase = supabaseClient;
-console.log("Supabase client initialized");
+
+console.log("Supabase ready:", Boolean(supabaseClient));
 
 async function testSupabaseConnection() {
+  if (!window.sadaSupabase) {
+    console.error("مكتبة Supabase أو إعداداتها غير متاحة.");
+    return;
+  }
+
   const { data, error } = await window.sadaSupabase
     .from("customers")
     .select("*")
@@ -165,7 +186,10 @@ async function testSupabaseConnection() {
   alert("تم الاتصال بقاعدة البيانات بنجاح!");
 }
 
-testSupabaseConnection();
+if (supabaseClient) {
+  testSupabaseConnection();
+}
+
 
 const $ = id => document.getElementById(id);
 const storageKey = "sadaAlEmarDemoV1";
