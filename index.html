@@ -15,7 +15,18 @@
 <div class="app">
 <aside class="side">
  <div class="brand"><div class="logo">▦</div><div><h2>صدى الإعمار للكونكريت الجاهز</h2><small>SADA AL-EMAR CONCRETE</small></div></div>
- <nav class="nav" id="nav">
+ <nav class="nav" id="nav"></nav>
+
+<div class="user">
+  نوع الحساب
+  <select id="roleSelect"
+    style="width:100%;margin:8px 0;padding:10px;border-radius:8px;background:#17232d;color:#f3f7fa;border:1px solid #29404d">
+    <option value="manager">مدير النظام</option>
+    <option value="accountant">المحاسب</option>
+    <option value="lab">مشغل المعمل</option>
+  </select>
+  <small id="roleNote">صلاحيات المدير</small>
+</div>
  <button class="active" data-page="dashboard">⌂　الرئيسية</button><button data-page="orders">▤　أوامر التجهيز</button><button data-page="loads">▣　الحمولات</button><button data-page="customers">♙　العملاء</button><button data-page="drivers">♧　السائقون</button><button data-page="vehicles">▱　الآليات والخلاطات</button><button data-page="reports">▥　التقارير والطباعة</button><button data-page="settings">⚙　الإعدادات</button>
  </nav>
  <div class="user">نسخة تجريبية محلية<br><b>مدير النظام</b></div>
