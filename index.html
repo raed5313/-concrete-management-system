@@ -80,6 +80,26 @@ function openSimple(type){let cfg={customer:{title:'إضافة عميل',key:'cu
 function del(type,id,key){if(confirm('هل تريد حذف هذا السجل؟')){data[type]=data[type].filter(x=>String(x[key])!==String(id));save();toast('تم الحذف')}}
 function receiptOrder(no){let o=data.orders.find(x=>x.no===no);if(!o)return;printDoc('وصل أمر تجهيز',`<h2>صدى الإعمار للكونكريت الجاهز</h2><h3>وصل أمر تجهيز رقم ${esc(o.no)}</h3><p>العميل: ${esc(o.customer)}</p><p>الهاتف: ${esc(o.phone)}</p><p>موقع الصب: ${esc(o.site)}</p><p>نوع الصب: ${esc(o.pour)}　 |　 المقاومة: ${esc(o.grade)}</p><p>الكمية التقديرية: ${esc(o.qty)} م³</p><p>السعر للمتر: ${esc(o.price||'—')}</p><p>التاريخ: ${esc(o.date)}</p><br><p>توقيع العميل: __________　 توقيع المسؤول: __________</p>`)}
 function receiptLoad(no){let l=data.loads.find(x=>x.no===no),o=data.orders.find(x=>x.no===l?.orderNo);if(!l)return;printDoc('وصل تجهيز حمولة',`<h2>صدى الإعمار للكونكريت الجاهز</h2><h3>وصل تجهيز رقم ${esc(l.no)}</h3><p>رقم الأمر: ${esc(l.orderNo)}</p><p>العميل: ${esc(o?.customer||'—')}</p><p>الموقع: ${esc(o?.site||'—')}</p><p>نوع الصب: ${esc(o?.pour||'—')}　 المقاومة: ${esc(o?.grade||'—')}</p><p>رقم الخلاطة: ${esc(l.vehicle)}　 السائق: ${esc(l.driver)}</p><p>الكمية: ${esc(l.qty)} م³　 وقت الخروج: ${esc(l.time)}</p><br><p>توقيع المختبر: __________　 توقيع العميل: __________</p>`)}
+ 
+function editLoad(no){
+  const l = data.loads.find(x => x.no === no);
+  if (!l) return;
+
+  showForm('تعديل وصل الحمولة رقم ' + l.no, [
+    {name:'orderNo',label:'رقم أمر التجهيز',required:true,value:l.orderNo},
+    {name:'driver',label:'السائق',value:l.driver},
+    {name:'vehicle',label:'رقم الخلاطة',value:l.vehicle},
+    {name:'qty',label:'الكمية م³',type:'number',required:true,value:l.qty},
+    {name:'time',label:'وقت الخروج',type:'time',value:l.time},
+    {name:'status',label:'الحالة',value:l.status},
+    {name:'pump',label:'رقم المضخة',value:l.pump}
+  ], v => {
+    Object.assign(l, v);
+    save();
+    toast('تم تعديل وصل الحمولة رقم ' + l.no);
+  });
+}
+
 function printDoc(title,body){let w=window.open('','_blank');if(!w){toast('اسمح بفتح النوافذ للطباعة');return}w.document.write(`<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><title>${title}</title><style>body{font-family:Tahoma,Arial;padding:24px;color:#111}h2,h3{text-align:center}p{border-bottom:1px solid #ddd;padding:10px}@media print{button{display:none}}</style><body>${body}<button onclick="print()">طباعة</button></body></html>`);w.document.close()}
 render();
 </script>
