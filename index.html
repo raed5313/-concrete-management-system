@@ -42,7 +42,31 @@
  <section id="loads" class="hidden"><div class="panel"><div class="panel-head"><h3>سجل الحمولات</h3><div class="actions"><button class="btn primary" onclick="openLoad()">＋ تسجيل حمولة</button><button class="btn" onclick="window.print()">طباعة</button></div></div><div class="tablewrap"><table><thead><tr><th>رقم الحمولة</th><th>رقم الأمر</th><th>السائق</th><th>الخلاطة</th><th>الكمية م³</th><th>وقت الخروج</th><th>الحالة</th><th>وصل</th></tr></thead><tbody id="loadsBody"></tbody></table></div></div></section>
  <section id="customers" class="hidden"><div class="panel"><div class="panel-head"><h3>العملاء</h3><button class="btn primary" onclick="openSimple('customer')">＋ إضافة عميل</button></div><div class="tablewrap"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>العنوان</th><th>إجراء</th></tr></thead><tbody id="customersBody"></tbody></table></div></div></section>
  <section id="drivers" class="hidden"><div class="panel"><div class="panel-head"><h3>السائقون</h3><button class="btn primary" onclick="openSimple('driver')">＋ إضافة سائق</button></div><div class="tablewrap"><table><thead><tr><th>اسم السائق</th><th>الهاتف</th><th>ملاحظات</th><th>إجراء</th></tr></thead><tbody id="driversBody"></tbody></table></div></div></section>
- <section id="vehicles" class="hidden"><div class="panel"><div class="panel-head"><h3>الآليات والخلاطات</h3><button class="btn primary" onclick="openSimple('vehicle')">＋ إضافة خلاطة</button></div><div class="tablewrap"><table><thead><tr><th>رقم الآلية</th><th>السعة م³</th><th>النوع</th><th>إجراء</th></tr></thead><tbody id="vehiclesBody"></tbody></table></div></section>
+ 
+<section id="vehicles" class="hidden">
+  <div class="panel">
+    <div class="panel-head">
+      <h3>الآليات والخلاطات</h3>
+      <button class="btn primary" onclick="openSimple('vehicle')">
+        ＋ إضافة خلاطة
+      </button>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>رقم الآلية</th>
+            <th>السعة م³</th>
+            <th>النوع</th>
+            <th>إجراء</th>
+          </tr>
+        </thead>
+        <tbody id="vehiclesBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
  <section id="reports" class="hidden"><div class="panel"><div class="panel-head"><h3>التقارير والطباعة</h3><button class="btn primary" onclick="window.print()">طباعة التقرير / حفظ PDF</button></div><div class="details"><div class="detail"><span>إجمالي الأوامر</span><strong id="reportOrders">0</strong></div><div class="detail"><span>إجمالي الحمولات</span><strong id="reportLoads">0</strong></div><div class="detail"><span>إجمالي الكميات المسجلة</span><strong id="reportQty">0 م³</strong></div><div class="detail"><span>الكمية المتبقية</span><strong id="reportRemaining">0 م³</strong></div></div><p class="muted">من نافذة الطباعة في الهاتف أو الحاسوب اختر «حفظ بصيغة PDF» إذا كان الخيار متاحاً.</p></div></section>
  <section id="settings" class="hidden"><div class="panel"><h3>إعدادات المنشأة</h3><p class="muted">صدى الإعمار للكونكريت الجاهز</p><div class="details"><div class="detail"><span>اسم النظام</span><strong>SADA AL-EMAR</strong></div><div class="detail"><span>الواجهة</span><strong>العربية RTL</strong></div><div class="detail"><span>التخزين الحالي</span><strong>محلي على هذا الجهاز</strong></div></div><p class="muted">هذه النسخة واجهة أولية تعمل محلياً. تسجيل الدخول متعدد المستخدمين ومزامنة قاعدة البيانات تحتاج إعداد Supabase ونشر متصل بالإنترنت.</p><button class="btn danger" onclick="if(confirm('حذف كل بيانات هذا المتصفح؟')){localStorage.removeItem(KEY);data=blank();render();toast('تم مسح البيانات المحلية')}">مسح البيانات المحلية</button></div></section>
  <div class="foot">نظام إدارة الخرسانة الجاهزة · SADA AL-EMAR CONCRETE</div>
