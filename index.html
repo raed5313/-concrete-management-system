@@ -149,7 +149,117 @@ function openLoad(orderNo){let order=data.orders.find(o=>o.no===orderNo);showFor
 function openSimple(type){let cfg={customer:{title:'إضافة عميل',key:'customers',fields:[{name:'name',label:'اسم العميل',required:true},{name:'phone',label:'رقم الهاتف'},{name:'address',label:'العنوان'}]},driver:{title:'إضافة سائق',key:'drivers',fields:[{name:'name',label:'اسم السائق',required:true},{name:'phone',label:'رقم الهاتف'},{name:'note',label:'ملاحظات'}]},vehicle:{title:'إضافة خلاطة',key:'vehicles',fields:[{name:'name',label:'رقم الآلية',required:true},{name:'capacity',label:'السعة م³',type:'number'},{name:'kind',label:'النوع',options:['خلاطة','مضخة','آلية أخرى']}]}}[type];showForm(cfg.title,cfg.fields,v=>{v.id=Date.now().toString();data[cfg.key].push(v);save();toast('تم الحفظ')})}
 function del(type,id,key){if(confirm('هل تريد حذف هذا السجل؟')){data[type]=data[type].filter(x=>String(x[key])!==String(id));save();toast('تم الحذف')}}
 function receiptOrder(no){let o=data.orders.find(x=>x.no===no);if(!o)return;printDoc('وصل أمر تجهيز',`<h2>صدى الإعمار للكونكريت الجاهز</h2><h3>وصل أمر تجهيز رقم ${esc(o.no)}</h3><p>العميل: ${esc(o.customer)}</p><p>الهاتف: ${esc(o.phone)}</p><p>موقع الصب: ${esc(o.site)}</p><p>نوع الصب: ${esc(o.pour)}　 |　 المقاومة: ${esc(o.grade)}</p><p>الكمية التقديرية: ${esc(o.qty)} م³</p><p>السعر للمتر: ${esc(o.price||'—')}</p><p>التاريخ: ${esc(o.date)}</p><br><p>توقيع العميل: __________　 توقيع المسؤول: __________</p>`)}
-function receiptLoad(no){let l=data.loads.find(x=>x.no===no),o=data.orders.find(x=>x.no===l?.orderNo);if(!l)return;printDoc('وصل تجهيز حمولة',`<h2>صدى الإعمار للكونكريت الجاهز</h2><h3>وصل تجهيز رقم ${esc(l.no)}</h3><p>رقم الأمر: ${esc(l.orderNo)}</p><p>العميل: ${esc(o?.customer||'—')}</p><p>الموقع: ${esc(o?.site||'—')}</p><p>نوع الصب: ${esc(o?.pour||'—')}　 المقاومة: ${esc(o?.grade||'—')}</p><p>رقم الخلاطة: ${esc(l.vehicle)}　 السائق: ${esc(l.driver)}</p><p>الكمية: ${esc(l.qty)} م³　 وقت الخروج: ${esc(l.time)}</p><br><p>توقيع المختبر: __________　 توقيع العميل: __________</p>`)}
+
+function receiptLoad(no){
+  let l=data.loads.find(x=>String(x.no)===String(no));
+  if(!l)return alert('لم يتم العثور على الحمولة');
+
+  let o=data.orders.find(x=>String(x.no)===String(l.orderNo));
+
+  printDoc('وصل تجهيز حمولة',`
+  <style>
+    @page{size:A5 portrait;margin:8mm}
+    body{font-family:Arial,sans-serif;direction:rtl;color:#17212b}
+    .receipt{
+      border:3px double #b99745;
+      padding:18px;
+      min-height:175mm;
+      box-sizing:border-box;
+      position:relative
+    }
+    .company{
+      text-align:center;
+      color:#172b45;
+      font-size:22px;
+      font-weight:bold;
+      margin-bottom:5px
+    }
+    .english{
+      text-align:center;
+      color:#a78636;
+      font-size:11px;
+      letter-spacing:1px
+    }
+    .heading{
+      text-align:center;
+      border-top:1px solid #b99745;
+      border-bottom:1px solid #b99745;
+      margin:12px 0;
+      padding:9px;
+      font-size:19px
+    }
+    .number{
+      text-align:center;
+      background:#172b45;
+      color:white;
+      padding:12px;
+      font-size:22px;
+      font-weight:bold;
+      margin:12px 0
+    }
+    .row{
+      padding:9px 3px;
+      border-bottom:1px solid #ddd;
+      font-size:14px
+    }
+    .signatures{
+      display:flex;
+      justify-content:space-between;
+      margin-top:35px;
+      text-align:center;
+      gap:12px
+    }
+    .signatures div{width:50%;line-height:2}
+    .footer{
+      text-align:center;
+      margin-top:22px;
+      color:#8b7133;
+      font-size:11px
+    }
+  </style>
+
+  <div class="receipt">
+    <div class="company">صدى الإعمار</div>
+    <div class="english">SADA AL-EMAR CONCRETE</div>
+    <div style="text-align:center;font-size:13px;margin-top:5px">
+      للكونكريت الجاهز
+    </div>
+
+    <div class="heading">وصل تجهيز خرسانة</div>
+
+    <div class="row">
+      <b>رقم الوصل:</b> ${esc(l.no)}
+      &nbsp;&nbsp;
+      <b>التاريخ:</b> ${esc(l.date||l.time||'—')}
+    </div>
+
+    <div class="number">رقم الحمولة: ${esc(l.no)}</div>
+
+    <div class="row"><b>رقم أمر التجهيز:</b> ${esc(l.orderNo||'—')}</div>
+    <div class="row"><b>اسم العميل:</b> ${esc(o?.customer||'—')}</div>
+    <div class="row"><b>موقع الصب:</b> ${esc(o?.site||'—')}</div>
+    <div class="row"><b>نوع الصب:</b> ${esc(o?.pour||'—')}</div>
+    <div class="row"><b>مقاومة الخرسانة:</b> ${esc(o?.grade||'—')}</div>
+    <div class="row"><b>اسم السائق:</b> ${esc(l.driver||'—')}</div>
+    <div class="row"><b>رقم الخلاطة:</b> ${esc(l.vehicle||'—')}</div>
+    <div class="row"><b>رقم المضخة:</b> ${esc(l.pump||'—')}</div>
+
+    <div class="number">الكمية المجهزة: ${esc(l.qty??'—')} م³</div>
+
+    <div class="row"><b>وقت الخروج:</b> ${esc(l.time||'—')}</div>
+
+    <div class="signatures">
+      <div>توقيع المختبر<br>________________</div>
+      <div>توقيع العميل<br>________________</div>
+    </div>
+
+    <div class="footer">
+      صدى الإعمار للكونكريت الجاهز — وصل تجهيز رسمي
+    </div>
+  </div>
+  `);
+}
+
  
 function editLoad(no){
   const l = data.loads.find(x => x.no === no);
