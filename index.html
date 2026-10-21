@@ -77,7 +77,24 @@ const pageNames={
  users:['المستخدمون والصلاحيات','إدارة صلاحيات المستخدمين'],
  settings:['الإعدادات','إعدادات النظام']
 };
-function navigate(page){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));Object.keys(pageNames).forEach(p=>$(p).classList.toggle('hidden',p!==page));$('pageTitle').textContent=pageNames[page][0];$('pageSub').textContent=pageNames[page][1];render()}
+
+function navigate(page) {
+  if (!pageNames[page] || !$(page)) return;
+
+  document.querySelectorAll('.nav button').forEach(b => {
+    b.classList.toggle('active', b.dataset.page === page);
+  });
+
+  Object.keys(pageNames).forEach(p => {
+    if ($(p)) $(p).classList.toggle('hidden', p !== page);
+  });
+
+  $('pageTitle').textContent = pageNames[page][0];
+  $('pageSub').textContent = pageNames[page][1];
+
+  render();
+}
+
 $('nav').addEventListener('click',e=>{const b=e.target.closest('button[data-page]');if(b)navigate(b.dataset.page)});
 function toast(msg){$('toast').textContent=msg;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2400)}
 function rows(items,fn,empty='لا توجد بيانات بعد'){return items.length?items.map(fn).join(''):`<tr><td colspan="9" class="empty">${empty}</td></tr>`}
