@@ -26,7 +26,6 @@
     <option value="lab">مشغل المعمل</option>
   </select>
   <small id="roleNote">صلاحيات المدير</small>
-</div>
  <nav class="nav" id="nav">
   <button class="active" data-page="dashboard">⌂ الرئيسية</button>
   <button data-page="orders">▤ أوامر التجهيز</button>
@@ -139,7 +138,7 @@ function editLoad(no){
 
 function printDoc(title,body){let w=window.open('','_blank');if(!w){toast('اسمح بفتح النوافذ للطباعة');return}w.document.write(`<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><title>${title}</title><style>body{font-family:Tahoma,Arial;padding:24px;color:#111}h2,h3{text-align:center}p{border-bottom:1px solid #ddd;padding:10px}@media print{button{display:none}}</style><body>${body}<button onclick="print()">طباعة</button></body></html>`);w.document.close()}
 render();
-</script>const roleMenus = {
+const roleMenus = {
   manager: [
     ['dashboard','⌂ الرئيسية'],
     ['orders','أوامر التجهيز'],
