@@ -53,6 +53,27 @@ for(const [type,el,fields] of [['customers','customersBody',['name','phone','add
 }
 function closeModal(){$('modal').classList.add('hidden')}
 function showForm(title,fields,submit){$('modalTitle').textContent=title;$('form').innerHTML=fields.map(f=>`<div class="field ${f.full?'full':''}"><label>${f.label}</label>${f.options?`<select name="${f.name}" ${f.required?'required':''}>${f.options.map(v=>`<option>${esc(v)}</option>`).join('')}</select>`:`<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} ${f.value!==undefined?`value="${esc(f.value)}"`:''} placeholder="${esc(f.placeholder||'')}">`}</div>`).join('')+`<div class="actions full"><button class="btn primary" type="submit">حفظ البيانات</button></div>`;$('form').onsubmit=e=>{e.preventDefault();submit(Object.fromEntries(new FormData(e.target)));closeModal()};$('modal').classList.remove('hidden')}
+ 
+function editOrder(no){
+  const o = data.orders.find(x => x.no === no);
+  if (!o) return;
+
+  showForm('تعديل وصل أمر التجهيز رقم ' + o.no, [
+    {name:'customer',label:'اسم العميل',required:true,value:o.customer},
+    {name:'phone',label:'رقم الهاتف',value:o.phone},
+    {name:'site',label:'موقع الصب',required:true,value:o.site},
+    {name:'pour',label:'نوع الصب',value:o.pour},
+    {name:'grade',label:'مقاومة الخرسانة',value:o.grade},
+    {name:'qty',label:'الكمية م³',type:'number',required:true,value:o.qty},
+    {name:'price',label:'سعر المتر',type:'number',value:o.price},
+    {name:'date',label:'التاريخ',type:'date',value:o.date},
+    {name:'note',label:'ملاحظات',full:true,value:o.note}
+  ], v => {
+    Object.assign(o, v);
+    save();
+    toast('تم تعديل الوصل رقم ' + o.no);
+  });
+}
 function openOrder(){showForm('تسجيل أمر تجهيز',[{name:'customer',label:'اسم العميل',required:true,options:['اختر العميل',...data.customers.map(c=>c.name)]},{name:'phone',label:'رقم الهاتف'},{name:'site',label:'عنوان / موقع الصب',required:true},{name:'pour',label:'نوع الصب',options:['سقف+درج','أساس','أعمدة','أرضية','جدار','أخرى']},{name:'grade',label:'مقاومة الخرسانة',options:['C-25','C-30','C-35','C-40','C-45']},{name:'qty',label:'الكمية التقديرية م³',type:'number',required:true},{name:'price',label:'سعر المتر بالدينار',type:'number'},{name:'date',label:'التاريخ',type:'date',value:new Date().toISOString().slice(0,10)},{name:'note',label:'ملاحظات',full:true}],v=>{if(v.customer==='اختر العميل')v.customer='';v.no=String(data.nextOrder++).padStart(7,'0');v.status='قيد التجهيز';data.orders.push(v);save();toast('تم تسجيل أمر التجهيز '+v.no)})}
 function openLoad(orderNo){let order=data.orders.find(o=>o.no===orderNo);showForm('تسجيل حمولة',[{name:'orderNo',label:'رقم أمر التجهيز',required:true,options:data.orders.length?data.orders.map(o=>o.no):['لا توجد أوامر']},{name:'driver',label:'السائق',options:['غير محدد',...data.drivers.map(x=>x.name)]},{name:'vehicle',label:'رقم الخلاطة',options:['غير محدد',...data.vehicles.map(x=>x.name)]},{name:'qty',label:'الكمية م³',type:'number',required:true,value:order?Math.min(9,order.qty):9},{name:'time',label:'وقت الخروج',type:'time',value:new Date().toTimeString().slice(0,5)},{name:'status',label:'الحالة',options:['تم التسجيل','في الطريق','تم التسليم']},{name:'pump',label:'رقم المضخة'}],v=>{v.no=String(data.nextLoad++).padStart(7,'0');data.loads.push(v);save();toast('تم تسجيل الحمولة '+v.no)})}
 function openSimple(type){let cfg={customer:{title:'إضافة عميل',key:'customers',fields:[{name:'name',label:'اسم العميل',required:true},{name:'phone',label:'رقم الهاتف'},{name:'address',label:'العنوان'}]},driver:{title:'إضافة سائق',key:'drivers',fields:[{name:'name',label:'اسم السائق',required:true},{name:'phone',label:'رقم الهاتف'},{name:'note',label:'ملاحظات'}]},vehicle:{title:'إضافة خلاطة',key:'vehicles',fields:[{name:'name',label:'رقم الآلية',required:true},{name:'capacity',label:'السعة م³',type:'number'},{name:'kind',label:'النوع',options:['خلاطة','مضخة','آلية أخرى']}]}}[type];showForm(cfg.title,cfg.fields,v=>{v.id=Date.now().toString();data[cfg.key].push(v);save();toast('تم الحفظ')})}
