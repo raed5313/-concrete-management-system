@@ -250,7 +250,7 @@ function renderOrdersWithLoads() {
     }
   );
 }
-$('loadsBody').innerHTML=rows(data.loads.slice().reverse(),l=>`<tr><td class="num">${esc(l.no)}</td><td>${esc(l.orderNo)}</td><td>${esc(l.driver||'—')}</td><td>${esc(l.vehicle||'—')}</td><td>${fmt(l.qty)}</td><td>${esc(l.time||'—')}</td><td><span class="pill">${esc(l.status||'تم التسجيل')}</span></td><td><div class="actions"><button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة</button><button class="btn danger" onclick="del('loads','${esc(l.no)}','no')">حذف</button></div></td></tr>`);
+
 for(const [type,el,fields] of [['customers','customersBody',['name','phone','address']],['drivers','driversBody',['name','phone','note']],['vehicles','vehiclesBody',['name','capacity','kind']]])$(el).innerHTML=rows(data[type],x=>`<tr>${fields.map(f=>`<td>${esc(x[f]||'—')}</td>`).join('')}<td><button class="btn danger" onclick="del('${type}','${esc(x.id)}','id')">حذف</button></td></tr>`)
 }
 function closeModal(){$('modal').classList.add('hidden')}
