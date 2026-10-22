@@ -116,7 +116,103 @@ function toast(msg){$('toast').textContent=msg;$('toast').style.display='block';
 function rows(items,fn,empty='لا توجد بيانات بعد'){return items.length?items.map(fn).join(''):`<tr><td colspan="9" class="empty">${empty}</td></tr>`}
 function render(){let total=data.orders.reduce((s,o)=>s+Number(o.qty||0),0),loaded=data.loads.reduce((s,l)=>s+Number(l.qty||0),0);$('statOrders').textContent=fmt(data.orders.length);$('statLoads').textContent=fmt(data.loads.length);$('statQty').textContent=fmt(loaded);$('statPending').textContent=fmt(data.orders.filter(o=>o.status!=='مكتمل').length);$('statCustomers').textContent=data.customers.length;$('statDrivers').textContent=data.drivers.length;$('statVehicles').textContent=data.vehicles.length;$('reportOrders').textContent=data.orders.length;$('reportLoads').textContent=data.loads.length;$('reportQty').textContent=fmt(loaded)+' م³';$('reportRemaining').textContent=fmt(Math.max(0,total-loaded))+' م³';
 $('recentOrders').innerHTML=rows(data.orders.slice(-5).reverse(),o=>`<tr><td class="num">${esc(o.no)}</td><td>${esc(o.customer)}</td><td>${esc(o.pour)}</td><td>${fmt(o.qty)} م³</td><td><span class="pill">${esc(o.status||'قيد التجهيز')}</span></td></tr>`);
-$('ordersBody').innerHTML=rows(data.orders.slice().reverse(),o=>`<tr><td class="num">${esc(o.no)}</td><td>${esc(o.date)}</td><td>${esc(o.customer)}</td><td>${esc(o.site)}</td><td>${esc(o.pour)}</td><td>${esc(o.grade)}</td><td>${fmt(o.qty)}</td><td><div class="actions"><button class="btn" onclick="openLoad('${esc(o.no)}')">＋ حمولة</button><button class="btn gold" onclick="receiptOrder('${esc(o.no)}')">وصل</button><button class="btn danger" onclick="del('orders','${esc(o.no)}','no')">حذف</button></div></td></tr>`);
+function renderOrdersWithLoads() {
+  $('ordersBody').innerHTML = rows(
+    data.orders.slice().reverse(),
+    o => {
+      const orderLoads = data.loads.filter(
+        l => String(l.orderNo) === String(o.no)
+      );
+
+      return `
+        <tr>
+          <td class="num">${esc(o.no)}</td>
+          <td>${esc(o.date)}</td>
+          <td>${esc(o.customer)}</td>
+          <td>${esc(o.site)}</td>
+          <td>${esc(o.pour)}</td>
+          <td>${esc(o.grade)}</td>
+          <td>${fmt(o.qty)}</td>
+          <td>
+            <div class="actions">
+              <button class="btn"
+                onclick="openLoad('${esc(o.no)}')">
+                ＋ حمولة (${orderLoads.length})
+              </button>
+              <button class="btn gold"
+                onclick="receiptOrder('${esc(o.no)}')">
+                وصل الأمر
+              </button>
+              <button class="btn danger"
+                onclick="del('orders','${esc(o.no)}','no')">
+                حذف
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td colspan="8"
+              style="padding:12px;background:#0b131a">
+            <strong style="color:var(--gold)">
+              حمولات أمر التجهيز ${esc(o.no)}
+            </strong>
+
+            ${
+              orderLoads.length
+                ? `
+                  <div class="tablewrap" style="margin-top:10px">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>رقم الحمولة</th>
+                          <th>السائق</th>
+                          <th>الخلاطة</th>
+                          <th>الكمية م³</th>
+                          <th>وقت الخروج</th>
+                          <th>الحالة</th>
+                          <th>الإجراءات</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${orderLoads.map(l => `
+                          <tr>
+                            <td class="num">${esc(l.no)}</td>
+                            <td>${esc(l.driver || '—')}</td>
+                            <td>${esc(l.vehicle || '—')}</td>
+                            <td>${fmt(l.qty)}</td>
+                            <td>${esc(l.time || '—')}</td>
+                            <td>${esc(l.status || 'تم التسجيل')}</td>
+                            <td>
+                              <div class="actions">
+                                <button class="btn gold"
+                                  onclick="receiptLoad('${esc(l.no)}')">
+                                  طباعة الوصل
+                                </button>
+                                <button class="btn"
+                                  onclick="editLoad('${esc(l.no)}')">
+                                  تعديل
+                                </button>
+                                <button class="btn danger"
+                                  onclick="del('loads','${esc(l.no)}','no')">
+                                  حذف
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        `).join('')}
+                      </tbody>
+                    </table>
+                  </div>
+                `
+                : `<p class="muted">لا توجد حمولات لهذا الأمر بعد.</p>`
+            }
+          </td>
+        </tr>
+      `;
+    }
+  );
+}
 $('loadsBody').innerHTML=rows(data.loads.slice().reverse(),l=>`<tr><td class="num">${esc(l.no)}</td><td>${esc(l.orderNo)}</td><td>${esc(l.driver||'—')}</td><td>${esc(l.vehicle||'—')}</td><td>${fmt(l.qty)}</td><td>${esc(l.time||'—')}</td><td><span class="pill">${esc(l.status||'تم التسجيل')}</span></td><td><div class="actions"><button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة</button><button class="btn danger" onclick="del('loads','${esc(l.no)}','no')">حذف</button></div></td></tr>`);
 for(const [type,el,fields] of [['customers','customersBody',['name','phone','address']],['drivers','driversBody',['name','phone','note']],['vehicles','vehiclesBody',['name','capacity','kind']]])$(el).innerHTML=rows(data[type],x=>`<tr>${fields.map(f=>`<td>${esc(x[f]||'—')}</td>`).join('')}<td><button class="btn danger" onclick="del('${type}','${esc(x.id)}','id')">حذف</button></td></tr>`)
 }
@@ -144,7 +240,82 @@ function editOrder(no){
   });
 }
 function openOrder(){showForm('تسجيل أمر تجهيز',[{name:'customer',label:'اسم العميل',required:true,options:['اختر العميل',...data.customers.map(c=>c.name)]},{name:'phone',label:'رقم الهاتف'},{name:'site',label:'عنوان / موقع الصب',required:true},{name:'pour',label:'نوع الصب',options:['سقف+درج','أساس','أعمدة','أرضية','جدار','أخرى']},{name:'grade',label:'مقاومة الخرسانة',options:['C-25','C-30','C-35','C-40','C-45']},{name:'qty',label:'الكمية التقديرية م³',type:'number',required:true},{name:'price',label:'سعر المتر بالدينار',type:'number'},{name:'date',label:'التاريخ',type:'date',value:new Date().toISOString().slice(0,10)},{name:'note',label:'ملاحظات',full:true}],v=>{if(v.customer==='اختر العميل')v.customer='';v.no=String(data.nextOrder++).padStart(7,'0');v.status='قيد التجهيز';data.orders.push(v);save();toast('تم تسجيل أمر التجهيز '+v.no)})}
-function openLoad(orderNo){let order=data.orders.find(o=>o.no===orderNo);showForm('تسجيل حمولة',[{name:'orderNo',label:'رقم أمر التجهيز',required:true,options:data.orders.length?data.orders.map(o=>o.no):['لا توجد أوامر']},{name:'driver',label:'السائق',options:['غير محدد',...data.drivers.map(x=>x.name)]},{name:'vehicle',label:'رقم الخلاطة',options:['غير محدد',...data.vehicles.map(x=>x.name)]},{name:'qty',label:'الكمية م³',type:'number',required:true,value:order?Math.min(9,order.qty):9},{name:'time',label:'وقت الخروج',type:'time',value:new Date().toTimeString().slice(0,5)},{name:'status',label:'الحالة',options:['تم التسجيل','في الطريق','تم التسليم']},{name:'pump',label:'رقم المضخة'}],v=>{v.no=String(data.nextLoad++).padStart(7,'0');data.loads.push(v);save();toast('تم تسجيل الحمولة '+v.no)})}
+function openLoad(orderNo) {
+  if (!data.orders.length) {
+    toast('سجّل أمر التجهيز أولاً');
+    return;
+  }
+
+  if (!orderNo) {
+    toast('افتح أمر التجهيز المطلوب ثم اضغط إضافة حمولة');
+    return;
+  }
+
+  const order = data.orders.find(
+    o => String(o.no) === String(orderNo)
+  );
+
+  if (!order) {
+    toast('أمر التجهيز غير موجود');
+    return;
+  }
+
+  showForm('تسجيل حمولة لأمر ' + order.no, [
+    {
+      name: 'orderNo',
+      label: 'رقم أمر التجهيز',
+      value: order.no,
+      required: true
+    },
+    {
+      name: 'driver',
+      label: 'السائق',
+      options: [
+        'غير محدد',
+        ...data.drivers.map(x => x.name)
+      ]
+    },
+    {
+      name: 'vehicle',
+      label: 'رقم الخلاطة',
+      options: [
+        'غير محدد',
+        ...data.vehicles.map(x => x.name)
+      ]
+    },
+    {
+      name: 'qty',
+      label: 'الكمية م³',
+      type: 'number',
+      required: true,
+      value: Math.min(9, Number(order.qty) || 9)
+    },
+    {
+      name: 'time',
+      label: 'وقت الخروج',
+      type: 'time',
+      value: new Date().toTimeString().slice(0, 5)
+    },
+    {
+      name: 'status',
+      label: 'الحالة',
+      options: ['تم التسجيل', 'في الطريق', 'تم التسليم']
+    },
+    {
+      name: 'pump',
+      label: 'رقم المضخة'
+    }
+  ], v => {
+    v.orderNo = order.no;
+    v.no = String(data.nextLoad++).padStart(7, '0');
+
+    data.loads.push(v);
+    save();
+
+    toast('تم تسجيل الحمولة ' + v.no +
+          ' ضمن الأمر ' + order.no);
+  });
+}
 function openSimple(type){let cfg={customer:{title:'إضافة عميل',key:'customers',fields:[{name:'name',label:'اسم العميل',required:true},{name:'phone',label:'رقم الهاتف'},{name:'address',label:'العنوان'}]},driver:{title:'إضافة سائق',key:'drivers',fields:[{name:'name',label:'اسم السائق',required:true},{name:'phone',label:'رقم الهاتف'},{name:'note',label:'ملاحظات'}]},vehicle:{title:'إضافة خلاطة',key:'vehicles',fields:[{name:'name',label:'رقم الآلية',required:true},{name:'capacity',label:'السعة م³',type:'number'},{name:'kind',label:'النوع',options:['خلاطة','مضخة','آلية أخرى']}]}}[type];showForm(cfg.title,cfg.fields,v=>{v.id=Date.now().toString();data[cfg.key].push(v);save();toast('تم الحفظ')})}
 function del(type,id,key){if(confirm('هل تريد حذف هذا السجل؟')){data[type]=data[type].filter(x=>String(x[key])!==String(id));save();toast('تم الحذف')}}
 function receiptOrder(no){let o=data.orders.find(x=>x.no===no);if(!o)return;printDoc('وصل أمر تجهيز',`<h2>صدى الإعمار للكونكريت الجاهز</h2><h3>وصل أمر تجهيز رقم ${esc(o.no)}</h3><p>العميل: ${esc(o.customer)}</p><p>الهاتف: ${esc(o.phone)}</p><p>موقع الصب: ${esc(o.site)}</p><p>نوع الصب: ${esc(o.pour)}　 |　 المقاومة: ${esc(o.grade)}</p><p>الكمية التقديرية: ${esc(o.qty)} م³</p><p>السعر للمتر: ${esc(o.price||'—')}</p><p>التاريخ: ${esc(o.date)}</p><br><p>توقيع العميل: __________　 توقيع المسؤول: __________</p>`)}
