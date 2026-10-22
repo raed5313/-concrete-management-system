@@ -12,6 +12,43 @@
 </style>
 </head>
 <body>
+<div id="loginScreen" style="
+position:fixed;inset:0;z-index:99999;
+background:#090d12;display:flex;
+align-items:center;justify-content:center;
+padding:20px;font-family:Tahoma,Arial">
+
+  <form id="loginForm" style="
+  width:100%;max-width:390px;background:#111a22;
+  border:1px solid #29404d;border-radius:18px;
+  padding:25px;color:#f3f7fa">
+
+    <h2 style="text-align:center;color:#42d8e8">
+      شركة صدى الإعمار
+    </h2>
+    <p style="text-align:center">تسجيل الدخول إلى النظام</p>
+
+    <label>اسم المستخدم</label>
+    <input id="loginUser" required autocomplete="username"
+      style="display:block;width:100%;padding:13px;
+      margin:8px 0 18px;border-radius:8px;box-sizing:border-box">
+
+    <label>كلمة المرور</label>
+    <input id="loginPass" type="password" required
+      autocomplete="current-password"
+      style="display:block;width:100%;padding:13px;
+      margin:8px 0 18px;border-radius:8px;box-sizing:border-box">
+
+    <button type="submit" style="
+    width:100%;padding:13px;border:0;border-radius:8px;
+    background:#42d8e8;color:#090d12;font-weight:bold">
+      دخول
+    </button>
+
+    <p id="loginError" style="color:#ff5365;text-align:center"></p>
+  </form>
+</div>
+
 <div class="app">
 <aside class="side">
  <div class="brand"><div class="logo">▦</div><div><h2>صدى الإعمار للكونكريت الجاهز</h2><small>SADA AL-EMAR CONCRETE</small></div></div>
@@ -522,6 +559,46 @@ document.getElementById('roleSelect').addEventListener('change', e => {
   navigate('dashboard');
 });
 
-buildMenu();
-navigate('dashboard');</script>
-</body></html>
+const loginAccounts = {
+  raed1: { password: '20021', role: 'manager' },
+  raed2: { password: '20022', role: 'accountant' },
+  raed:  { password: '2002',  role: 'lab' }
+};
+
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  const account = loginAccounts[username];
+
+  if (!account || account.password !== password) {
+    document.getElementById('loginError').textContent =
+      'اسم المستخدم أو كلمة المرور غير صحيحة';
+    return;
+  }
+
+  sessionStorage.setItem('sada-login-user', username);
+  sessionStorage.setItem('sada-login-role', account.role);
+
+  document.getElementById('loginScreen').style.display = 'none';
+
+  currentRole = account.role;
+  localStorage.setItem('sada-role', currentRole);
+
+  buildMenu();
+  navigate('dashboard');
+});
+
+const savedUser = sessionStorage.getItem('sada-login-user');
+const savedRole = sessionStorage.getItem('sada-login-role');
+
+if (savedUser && savedRole && loginAccounts[savedUser] &&
+    loginAccounts[savedUser].role === savedRole) {
+  document.getElementById('loginScreen').style.display = 'none';
+  currentRole = savedRole;
+  buildMenu();
+  navigate('dashboard');
+} else {
+  document.getElementById('loginScreen').style.display = 'flex';
+}
