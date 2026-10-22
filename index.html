@@ -39,7 +39,7 @@
   <section class="panel"><div class="panel-head"><h3>ملخص العمل</h3></div><div class="details"><div class="detail"><span>عدد العملاء</span><strong id="statCustomers">0</strong></div><div class="detail"><span>عدد السائقين</span><strong id="statDrivers">0</strong></div><div class="detail"><span>عدد الخلاطات</span><strong id="statVehicles">0</strong></div><div class="detail"><span>العملة</span><strong>دينار عراقي</strong></div></div><p class="muted">تُحفظ البيانات في هذا المتصفح على الجهاز الحالي.</p></section></div>
  </section>
  <section id="orders" class="hidden"><div class="panel"><div class="panel-head"><h3>سجل أوامر التجهيز</h3><div class="actions"><button class="btn primary" onclick="openOrder()">＋ إضافة أمر</button><button class="btn" onclick="window.print()">طباعة</button></div></div><div class="tablewrap"><table><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>العميل</th><th>موقع الصب</th><th>نوع الصب</th><th>المقاومة</th><th>الكمية م³</th><th>الإجراءات</th></tr></thead><tbody id="ordersBody"></tbody></table></div></div></section>
- <section id="loads" class="hidden"><div class="panel"><div class="panel-head"><h3>سجل الحمولات</h3><div class="actions"><button class="btn primary" onclick="openLoad()">＋ تسجيل حمولة</button><button class="btn" onclick="window.print()">طباعة</button></div></div><div class="tablewrap"><table><thead><tr><th>رقم الحمولة</th><th>رقم الأمر</th><th>السائق</th><th>الخلاطة</th><th>الكمية م³</th><th>وقت الخروج</th><th>الحالة</th><th>وصل</th></tr></thead><tbody id="loadsBody"></tbody></table></div></div></section>
+ 
  <section id="customers" class="hidden"><div class="panel"><div class="panel-head"><h3>العملاء</h3><button class="btn primary" onclick="openSimple('customer')">＋ إضافة عميل</button></div><div class="tablewrap"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>العنوان</th><th>إجراء</th></tr></thead><tbody id="customersBody"></tbody></table></div></div></section>
  <section id="drivers" class="hidden"><div class="panel"><div class="panel-head"><h3>السائقون</h3><button class="btn primary" onclick="openSimple('driver')">＋ إضافة سائق</button></div><div class="tablewrap"><table><thead><tr><th>اسم السائق</th><th>الهاتف</th><th>ملاحظات</th><th>إجراء</th></tr></thead><tbody id="driversBody"></tbody></table></div></div></section>
  
@@ -78,7 +78,6 @@ const $=id=>document.getElementById(id);const save=()=>{localStorage.setItem(KEY
 const pageNames={
  dashboard:['لوحة التحكم','متابعة العمل اليومي'],
  orders:['أوامر التجهيز','إدارة طلبات الخرسانة'],
- loads:['الحمولات','متابعة حمولات الخلاطات'],
  customers:['العملاء','بيانات العملاء'],
  labs:['المعامل','إدارة المعامل'],
  drivers:['السائقون','إدارة السائقين'],
@@ -286,7 +285,6 @@ const roleMenus = {
   manager: [
     ['dashboard','⌂ الرئيسية'],
     ['orders','أوامر التجهيز'],
-    ['loads','الحمولات'],
     ['customers','العملاء'],
     ['labs','المعامل'],
     ['drivers','السائقون'],
