@@ -562,43 +562,53 @@ document.getElementById('roleSelect').addEventListener('change', e => {
 const loginAccounts = {
   raed1: { password: '20021', role: 'manager' },
   raed2: { password: '20022', role: 'accountant' },
-  raed:  { password: '2002',  role: 'lab' }
+  raed:  { password: '2002', role: 'lab' }
 };
 
-document.getElementById('loginForm').addEventListener('submit', function(e) {
+const loginForm = document.getElementById('loginForm');
+
+loginForm.addEventListener('submit', function (e) {
   e.preventDefault();
 
   const username = document.getElementById('loginUser').value.trim();
   const password = document.getElementById('loginPass').value;
+  const error = document.getElementById('loginError');
   const account = loginAccounts[username];
 
   if (!account || account.password !== password) {
-    document.getElementById('loginError').textContent =
-      'اسم المستخدم أو كلمة المرور غير صحيحة';
+    error.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة';
     return;
   }
 
-  sessionStorage.setItem('sada-login-user', username);
-  sessionStorage.setItem('sada-login-role', account.role);
-
-  document.getElementById('loginScreen').style.display = 'none';
+  try {
+    sessionStorage.setItem('sada-login-user', username);
+    sessionStorage.setItem('sada-login-role', account.role);
+    localStorage.setItem('sada-role', account.role);
+  } catch (err) {
+    error.textContent = 'تعذر حفظ جلسة الدخول. افتح الموقع في المتصفح مباشرة.';
+    return;
+  }
 
   currentRole = account.role;
-  localStorage.setItem('sada-role', currentRole);
-
   buildMenu();
   navigate('dashboard');
+
+  document.getElementById('loginScreen').style.display = 'none';
 });
 
 const savedUser = sessionStorage.getItem('sada-login-user');
 const savedRole = sessionStorage.getItem('sada-login-role');
 
-if (savedUser && savedRole && loginAccounts[savedUser] &&
-    loginAccounts[savedUser].role === savedRole) {
-  document.getElementById('loginScreen').style.display = 'none';
+if (
+  savedUser &&
+  savedRole &&
+  loginAccounts[savedUser] &&
+  loginAccounts[savedUser].role === savedRole
+) {
   currentRole = savedRole;
   buildMenu();
   navigate('dashboard');
+  document.getElementById('loginScreen').style.display = 'none';
 } else {
   document.getElementById('loginScreen').style.display = 'flex';
 }
